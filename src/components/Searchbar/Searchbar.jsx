@@ -1,24 +1,24 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { BsSearch } from 'react-icons/bs';
 import css from './Searchbar.module.css';
 import PropTypes from 'prop-types';
 
-class Searchbar extends Component {
-  handleSubmit = async (e) => {
+const Searchbar = ({onSubmit})=> {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
     const input = form.search.value.trim();
 
     if (input) {
-      this.props.onSubmit(input);
+      onSubmit(input);
       form.reset();
     }
   };
 
-  render() {
+
     return (
       <header className={css.searchbar}>
-        <form onSubmit={this.handleSubmit} className={css.form}>
+        <form onSubmit={handleSubmit} className={css.form}>
           <input
             type="text"
             placeholder="Search images..."
@@ -34,7 +34,7 @@ class Searchbar extends Component {
       </header>
     );
   }
-}
+
 
 Searchbar.propTypes = {
   onSubmit: PropTypes.func
