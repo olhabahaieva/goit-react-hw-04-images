@@ -6,42 +6,38 @@ import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
 
-const App = ({ query, images, page, isLoading, largeImageURL, tags }) => {
-  const [imagesState, setImages] = useState([]);
-  const [pageState, setPage] = useState(1);
-  // eslint-disable-next-line
+const App = ({ isLoading, tags }) => {
+  const [images, setImages] = useState([]);
   const [isLoadingState, setIsLoading] = useState(false);
-  const [queryState, setQuery] = useState('');
-  const [largeImageURLState, setLargeImageURL] = useState(null);
-
-
+  const [query, setQuery] = useState('');
+  const [largeImageURL, setLargeImageURL] = useState(null);
 
   const onSubmit = async query => {
     setQuery(query);
     setImages([]);
-    setPage(1);
+  };
+
+  const fetchPhotoByName = async (query, page) => {
+    try {
+      setIsLoading(true);
+      const photoByName = await getImages(query, page);
+      setImages(prevImages => [...prevImages, ...photoByName.hits]);
+    } catch (err) {
+      console.log('error', err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchPhotoByName = async () => {
-      if (queryState !== '' && pageState === 1) {
-        try {
-          setIsLoading(true);
-          const photoByName = await getImages(queryState, pageState);
-          setImages(photoByName.hits);
-        } catch (err) {
-          console.log('error', err.message);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-  
-    fetchPhotoByName();
-  }, [queryState, pageState]);
+    if (query !== '') {
+      fetchPhotoByName(query, 1);
+    }
+  }, [query]);
 
   const onLoadMore = async () => {
-    setPage(page + 1);
+    const nextPage = Math.ceil(images.length / 12) + 1;
+    fetchPhotoByName(query, nextPage);
   };
 
   const openModal = largeImageURL => {
@@ -63,17 +59,17 @@ const App = ({ query, images, page, isLoading, largeImageURL, tags }) => {
       }}
     >
       <Searchbar onSubmit={onSubmit} />
-      {isLoading ? (
+      {isLoadingState ? (
         <Loader />
       ) : (
         <>
-          <ImageGallery images={imagesState} page={pageState} openModal={openModal} />
-          {imagesState.length > 0 && imagesState.length >= 12 && (<Button onLoadMore={onLoadMore} />)}
+          <ImageGallery images={images} page={1} openModal={openModal} />
+          {images.length >= 12 && <Button onLoadMore={onLoadMore} />}
         </>
       )}
-      {largeImageURLState !== null && (
+      {largeImageURL !== null && (
         <Modal
-          largeImageURL={largeImageURLState}
+          largeImageURL={largeImageURL}
           tags={tags}
           closeModal={closeModal}
         />
