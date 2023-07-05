@@ -5,8 +5,9 @@ import getImages from './api/getImages';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
+import PropTypes from 'prop-types';
 
-const App = ({ isLoading, tags }) => {
+const App = ({ tags }) => {
   const [images, setImages] = useState([]);
   const [isLoadingState, setIsLoading] = useState(false);
   const [query, setQuery] = useState('');
@@ -77,5 +78,9 @@ const App = ({ isLoading, tags }) => {
     </div>
   );
 };
+
+App.propTypes = {
+  tags: PropTypes.string
+}
 
 export default App;
